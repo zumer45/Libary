@@ -1,9 +1,8 @@
 const myLibrary = [];
 
-const form = document.querySelector("form");
 const container = document.querySelector(".container");
 
-function Book(title, author, pages, read = "false") {
+function Book(title, author, pages, read = false) {
   this.title = title;
   this.author = author;
   this.pages = pages;
@@ -15,6 +14,7 @@ function addBookToLibrary(book) {
 }
 
 function displayBooks() {
+  container.innerHTML = "";
   myLibrary.forEach((book) => {
     let bookDiv = document.createElement("div");
     bookDiv.className = "book";
@@ -46,12 +46,49 @@ function displayBooks() {
     bookDiv.appendChild(pages);
     bookDiv.appendChild(read);
     bookDiv.appendChild(del);
-
+    localStorage.setItem(book.title, JSON.stringify(book));
     container.appendChild(bookDiv);
   });
 }
 
-// Sample books
+function deleteBook() {
+  container.addEventListener("click", (e) => {
+    if (e.target.classList.contains("material-symbols-outlined")) {
+      const index = Array.from(container.children).indexOf(
+        e.target.parentElement
+      );
+
+      const element = myLibrary[index];
+
+      localStorage.removeItem(element.title);
+      console.log(`Deleted ${element.title} from Local Storage`);
+
+      myLibrary.splice(index, 1);
+      console.log(`Deleted ${element.title} from internal array`);
+
+      displayBooks();
+    }
+  });
+}
+
+function addBook() {
+  const form = document.querySelector(".form");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+
+    const title = formData.get("title");
+    const author = formData.get("author");
+    const pages = formData.get("pages");
+    const read = formData.get("read");
+
+    console.log("Title:", title);
+    console.log("Author:", author);
+    console.log("Pages:", pages);
+    console.log("Read:", read);
+  });
+}
+
 const book1 = new Book("To Kill a Mockingbird", "Harper Lee", 281, "true");
 const book2 = new Book("1984", "George Orwell", 328, "false");
 const book3 = new Book("The Great Gatsby", "F. Scott Fitzgerald", 180, "true");
@@ -63,3 +100,5 @@ addBookToLibrary(book3);
 addBookToLibrary(book4);
 
 displayBooks();
+deleteBook();
+addBook();
