@@ -1,6 +1,9 @@
 const myLibrary = [];
+const fetchedBooks = [];
 
 const container = document.querySelector(".container");
+const popular = document.querySelector(".popular");
+let fetchValue = false;
 
 function Book(title, author, pages, read = false) {
   this.title = title;
@@ -11,10 +14,14 @@ function Book(title, author, pages, read = false) {
 
 function addBookToLibrary(book) {
   myLibrary.push(book);
+  addToLocalStorage(book);
 }
 
 function displayBooks() {
   container.innerHTML = "";
+  let bookList = document.querySelector(".book-list");
+  bookList.innerHTML = "";
+
   myLibrary.forEach((book) => {
     let bookDiv = document.createElement("div");
     bookDiv.className = "book";
@@ -46,9 +53,19 @@ function displayBooks() {
     bookDiv.appendChild(pages);
     bookDiv.appendChild(read);
     bookDiv.appendChild(del);
-    localStorage.setItem(book.title, JSON.stringify(book));
+
     container.appendChild(bookDiv);
   });
+
+  if (fetchValue) {
+    fetchedBooks.forEach((work, index) => {
+      let li = document.createElement("li");
+      li.innerHTML = `${index + 1}. <span class="label">Title:</span> ${
+        work.title
+      } by ${work.authors[0].name}`;
+      bookList.appendChild(li);
+    });
+  }
 }
 
 function deleteBook() {
@@ -57,17 +74,42 @@ function deleteBook() {
       const index = Array.from(container.children).indexOf(
         e.target.parentElement
       );
-
       const element = myLibrary[index];
 
-      localStorage.removeItem(element.title);
-      console.log(`Deleted ${element.title} from Local Storage`);
-
+      const localStorageItem = localStorage.getItem(element.title);
+      if (localStorageItem) {
+        console.log(`Deleting ${element.title} from localStorage`);
+        localStorage.removeItem(element.title);
+      } else {
+        console.log(
+          `Title ${JSON.parse(element.title)} not found in localStorage`
+        );
+      }
       myLibrary.splice(index, 1);
-      console.log(`Deleted ${element.title} from internal array`);
 
+      console.log(`Deleted ${element.title} from internal array`);
+      console.log(myLibrary);
       displayBooks();
     }
+  });
+}
+
+function updateToRead() {
+  container.addEventListener("click", (e) => {
+    const index = Array.from(container.children).indexOf(
+      e.target.parentElement
+    );
+
+    if (myLibrary[index].read === false) {
+      myLibrary[index].read = true;
+    } else {
+      myLibrary[index].read = false;
+    }
+    localStorage.clear();
+    myLibrary.forEach((book) => {
+      localStorage.setItem(book.title, JSON.stringify(book));
+    });
+    displayBooks();
   });
 }
 
@@ -80,25 +122,68 @@ function addBook() {
     const title = formData.get("title");
     const author = formData.get("author");
     const pages = formData.get("pages");
-    const read = formData.get("read");
+    let read = formData.get("read") ? true : false;
 
-    console.log("Title:", title);
-    console.log("Author:", author);
-    console.log("Pages:", pages);
-    console.log("Read:", read);
+    if (!title) {
+      alert("Please enter a title.");
+      return;
+    }
+
+    const isDuplicate = myLibrary.some(
+      (book) => book.title === title && book.author === author
+    );
+
+    if (isDuplicate) {
+      alert("Can't add the same book twice");
+      return;
+    }
+
+    const newBook = new Book(title, author, pages, read);
+    addBookToLibrary(newBook);
+    displayBooks();
   });
 }
 
-const book1 = new Book("To Kill a Mockingbird", "Harper Lee", 281, "true");
-const book2 = new Book("1984", "George Orwell", 328, "false");
-const book3 = new Book("The Great Gatsby", "F. Scott Fitzgerald", 180, "true");
-const book4 = new Book("Pride and Prejudice", "Jane Austen", 279, "false");
+async function fetchData() {
+  try {
+    const res = await fetch(
+      "https://openlibrary.org/subjects/popular.json?limit=5"
+    );
+    const data = await res.json();
+    data.works.forEach((work) => {
+      const newBook = new Book(work.title, work.authors[0].name, "N/A", false);
+      fetchedBooks.push(work);
+      fetchValue = true;
+    });
+    displayBooks();
+  } catch (err) {
+    console.log(err);
+  }
+}
 
-addBookToLibrary(book1);
-addBookToLibrary(book2);
-addBookToLibrary(book3);
-addBookToLibrary(book4);
+function addToLocalStorage(book) {
+  localStorage.setItem(book.title, JSON.stringify(book));
+}
+
+function addYear() {
+  const year = document.querySelector(".year");
+  const date = new Date();
+  const currYear = date.getFullYear();
+  year.textContent = `${currYear} `;
+}
+// const book1 = new Book("To Kill a Mockingbird", "Harper Lee", 281, true);
+// const book2 = new Book("1984", "George Orwell", 328, false);
+// const book3 = new Book("The Great Gatsby", "F. Scott Fitzgerald", 180, true);
+// const book4 = new Book("Pride and Prejudice", "Jane Austen", 279, false);
+
+// addBookToLibrary(book1);
+// addBookToLibrary(book2);
+// addBookToLibrary(book3);
+// addBookToLibrary(book4);
 
 displayBooks();
 deleteBook();
 addBook();
+fetchData();
+updateToRead();
+addYear();

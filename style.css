@@ -97,6 +97,17 @@ button:hover {
   background-color: #ffb300;
   transform: translateY(-5px);
 }
+.my-lib {
+  margin: 50px auto;
+  text-align: center;
+}
+
+.my-lib h1 {
+  font-size: 50px;
+}
+.my-lib p {
+  font-size: 20px;
+}
 
 .container {
   display: flex;
@@ -105,6 +116,18 @@ button:hover {
   align-items: center;
   gap: 15px;
   margin-top: 100px;
+}
+
+.popular p {
+  text-align: center;
+  margin-top: 50px;
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.popular {
+  display: flex;
+  flex-direction: column;
 }
 
 .book {
@@ -120,9 +143,30 @@ button:hover {
   border-radius: 8px;
 }
 
-.book:hover {
+.book:hover,
+.book-list li:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.book-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+}
+
+.book-list li {
+  margin: 10px auto;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+  display: block;
+  width: 50%;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .material-symbols-outlined {
@@ -137,4 +181,51 @@ button:hover {
 
 .label {
   color: yellow;
+}
+
+footer {
+  margin: 100px auto;
+}
+
+.icons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.fa-github {
+  color: black;
+}
+.fa-linkedin {
+  color: blue;
+}
+.fa-envelope {
+  color: white;
+}
+
+i {
+  height: 100px;
+  width: 100px;
+  font-size: 50px;
+  text-align: center;
+  margin: 10px 30px;
+}
+
+i:hover {
+  transform: translateY(-5px);
+}
+
+.fa-copyright {
+  font-size: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.year {
+  display: inline;
+}
+
+.copyright {
+  font-size: 20px;
+  text-align: center;
 }
